@@ -62,7 +62,6 @@ def create_new_frame(image_file, green_file, process_file):
 # TODO add any functions you need here
 
 
-
 if __name__ == '__main__':
     all_process_time = timeit.default_timer()
 
