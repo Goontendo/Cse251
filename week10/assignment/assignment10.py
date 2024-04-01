@@ -57,19 +57,101 @@ Instructions:
 
 import time
 import threading
+import logging
+import random
 
 PHILOSOPHERS = 5
 MAX_MEALS = PHILOSOPHERS * 5
+MEAL_COUNT = [0, 0, 0, 0, 0]
+THINK_COUNT = [0, 0, 0, 0, 0]
+EATING_COUNT = [0, 0, 0, 0, 0]
+
+
+class Waiter(object):
+    def __init__(self,
+                 number):
+        self.cv = threading.Condition(threading.Lock())
+        self.p = number
+
+    def up(self):
+        # waiters tells philospher to eat
+        print('waiters is telling philosopher to eat\n')
+        with self.cv:
+            while self.p == 0:
+                self.cv.wait()
+            self.p -= 1
+
+    def down(self):
+        # waiters tell philosopher to stop
+        with self.cv:
+            self.p += 1
+            self.cv.notify_all()
+            print('waiter is telling philosopher he is done eating\n')
+
+
+class Philosopher (threading.Thread):
+
+    def __init__(self, number, left, right, Waiter):
+        threading.Thread.__init__(self)
+        self.number = number            # philosopher number
+        self.left = left
+        self.right = right
+        self.waiter = Waiter
+
+    def run(self):
+        global MAX_MEALS
+        global MEAL_COUNT
+        global THINK_COUNT
+        global EATING_COUNT
+        # for loop to rotate forks between philosophers
+        for i in range(MAX_MEALS - 5):
+            self.waiter.up()
+            print('made it pass waiter\n')
+            self.left.acquire()
+            print('left forked is picked up\n')
+            self.right.acquire()
+            print('right forked is picked up\n')
+            print(f'eating has started')
+            eating = random.randrange(1, 3)
+            time.sleep(eating)
+            EATING_COUNT[self.number] += eating
+            self.right.release()
+            self.left.release()
+            print('forks are set down\n')
+            thinking = random.randrange(1, 3)
+            time.sleep(thinking)
+            THINK_COUNT[self.number] += thinking
+            MEAL_COUNT[self.number] += 1
+            self.waiter.down()
+
 
 def main():
     # TODO - create the waiter (A class would be best here).
-    # TODO - create the forks (What kind of object should a fork be?).
-    # TODO - create PHILOSOPHERS philosophers.
-    # TODO - Start them eating and thinking.
-    # TODO - Display how many times each philosopher ate, 
-    #        how long they spent eating, and how long they spent thinking.
+    global PHILOSOPHERS
+    global MEAL_COUNT
+    global EATING_COUNT
+    waiter = Waiter(PHILOSOPHERS - 1)
 
-    pass
+    # TODO - create the forks (What kind of object should a fork be?).
+    forks = [threading.Lock() for i in range(PHILOSOPHERS)]
+
+    # TODO - create PHILOSOPHERS philosophers.
+    phil = [Philosopher(i, forks[i], forks[(i+1) % PHILOSOPHERS], waiter)
+            for i in range(PHILOSOPHERS)]
+
+    # TODO - Start them eating and thinking.
+    for p in range(PHILOSOPHERS):
+        phil[p].start()
+    for p in range(PHILOSOPHERS):
+        phil[p].join()
+
+    # TODO - Display how many times each philosopher ate,
+    #        how long they spent eating, and how long they spent thinking.
+    for i in range(PHILOSOPHERS):
+        print(f'Philosopher {i + 1} ate {MEAL_COUNT[i]} meals')
+        print(f'Philosopher {i + 1} thought for {THINK_COUNT[i]} seconds')
+        print(f'Philosopher {i + 1} ate for {EATING_COUNT[i]} seconds')
+
 
 if __name__ == '__main__':
     main()

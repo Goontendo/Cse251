@@ -15,6 +15,7 @@ TODO
 #include <iostream>
 #include <cstdlib>
 #include <pthread.h>
+#include <math.h>
 
 #ifdef _WIN32
 #include <io.h>
@@ -86,13 +87,55 @@ int main()
   }
   cout << endl;
 
+  //creates threads
+  pthread_t thread;
+  int threads;
+
+  //asks users for threads desired for experiment
+  cout << "input number:";
+  cin >> threads;
+  cout << endl;
+
+  // intialize numbers needed for calculations
+  int start = 0;
+  int end = 0;
+  int addition = 0;
+  int segments = NUMBERS/threads;
   // Create structure that will be used to pass the array and the
   // start of end of the array to another function
-  struct args rec = { arrayValues, 0, NUMBERS - 1 };
-
+  
+  
   // Find the primes in the array
-  findPrimes(&rec);
+  //findPrimes(&rec);
 
+  //create threads
+  for(int i = 0; i < threads; i++)
+  {  
+    end = start + segments;
+    cout << "here is start: " << start << endl;
+    cout << "here is end: " << end << endl;
+    struct args rec = { arrayValues, start, end - 1 };
+    start = start + segments;
+    pthread_create(&thread, NULL, &findPrimes, &rec);
+
+    //adds last remaining numbers incase threads are odd numbers
+    if ( i == 0 )
+    {
+      if (segments * threads != NUMBERS)
+      {
+        addition = NUMBERS - (segments*threads);
+        start = start + addition;
+      }
+    }  
+  }
+
+  for(int i = 0; i < threads; i++)
+  {
+    pthread_join(thread, NULL);
+  } 
+  
+  pthread_exit(NULL);
+  
   return 0;
 }
  

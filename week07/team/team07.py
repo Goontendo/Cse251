@@ -18,6 +18,7 @@ import multiprocessing as mp
 import threading
 import time
 
+
 def is_prime(n: int) -> bool:
     """Primality test using 6k+-1 optimization.
     From: https://en.wikipedia.org/wiki/Primality_test
@@ -33,9 +34,31 @@ def is_prime(n: int) -> bool:
         i += 6
     return True
 
-# TODO create read_thread function
 
-# TODO create prime_process function
+def read_thread(q: mp.Queue, filename, cpu_count):
+    file = open(filename)
+
+    for line in file:
+        q.put(int(line.strip()))
+
+    for _ in range(cpu_count):
+        q.put(None)
+
+    file.close()
+
+
+def prime_processes(q: mp.Queue, primes):
+    while True:
+
+        num = q.get()
+
+        if num == None:
+            break
+
+        else:
+            if is_prime(num) == True:
+                primes.append(num)
+
 
 def main():
     """ Main function """
@@ -44,22 +67,40 @@ def main():
 
     # Start a timer
     begin_time = time.perf_counter()
-    
+
     # Get number of processes to create based on cpu count
     cpu_count = mp.cpu_count()
 
     # TODO Create shared data structures
+    q = mp.Queue()
+
+    primes = mp.Manager().list([])
 
     # TODO create reading thread
+    thread = threading.Thread(
+        target=read_thread, args=(q, filename, cpu_count))
 
     # TODO create prime processes
+    process = []
+    for _ in range(cpu_count):
+        process.append(mp.Process(target=prime_processes, args=(q, primes)))
 
     # TODO Start them all
+    thread.start()
+
+    for p in process:
+        p.start()
 
     # TODO wait for them to complete
+    thread.join()
+
+    for p in process:
+        p.join()
 
     total_time = "{:.2f}".format(time.perf_counter() - begin_time)
     print(f'Total time = {total_time} sec')
+
+    print(len(primes))
 
     # Assert the correct amount of primes were found.
     assert len(primes) == 321, "You should find exactly 321 prime numbers"
@@ -67,4 +108,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

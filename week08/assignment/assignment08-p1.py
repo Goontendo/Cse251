@@ -14,18 +14,49 @@ COLOR = (0, 0, 255)
 
 
 # TODO add any functions
+def recursion(maze: Maze, solution_path, position):
+    # initialize row and column
+    row = position[0]
+    col = position[1]
+
+    # add path to maze
+    solution_path.append(position)
+
+    # Checks to see if maze is done
+    if maze.at_end(row, col):
+        return True
+
+    # creates Array of Possible Arrays
+    moves = maze.get_possible_moves(row, col)
+
+    # For loop to look for possible moves and make the correct moves
+    for i in range(len(moves)):
+        if maze.can_move_here(moves[i][0], moves[i][1]):
+            maze.move(moves[i][0], moves[i][1], COLOR)
+        if recursion(maze, solution_path, moves[i]) == True:
+            return True
+        else:
+            maze.restore(moves[i][0], moves[i][1])
+            solution_path.pop()
+
 
 def solve(maze):
     """ Solve the maze. The path object should be a list (x, y) of the positions 
         that solves the maze, from the start position to the end position. """
 
     # TODO add code here
-    solution_path = [] 
-    
-    # Remember that an object is passed by reference, so you can pass in the 
-    # solution_path object, modify it, and you won't need to return it from 
+    solution_path = []
+
+    start = maze.get_start_pos()
+
+    maze.move(start[0], start[1], COLOR)
+
+    recursion(maze, solution_path, maze.get_start_pos())
+
+    # Remember that an object is passed by reference, so you can pass in the
+    # solution_path object, modify it, and you won't need to return it from
     # your recursion function
-    
+
     return solution_path
 
 

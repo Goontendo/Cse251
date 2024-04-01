@@ -1,3 +1,7 @@
+import glob
+import os
+import random
+import json
 """
 Course: CSE 251
 Lesson Week: 09
@@ -6,24 +10,19 @@ Author: Brother Comeau
 Purpose: Create task files
 """
 
-import json
-import random
-import os
-import glob
 
-
-words =[
-    'vessel', 'threat', 'detail', 'inquiry', 'marsh', 'revise', 'amber', 'welfare', 'enlarge', 'conglomerate', 'betray', 'falseify', 
-    'exploration', 'theorist', 'regret', 'strange', 'ignite', 'recycle', 'leaf', 'excavate', 'angwer', 'install', 'latest', 'cruel', 
-    'yearn', 'possible', 'bad', 'liberal', 'brother', 'burn', 'minimum', 'kettle', 'side', 
-    'migration', 'growth', 'greeting', 'deall', 'genuine', 'psychology', 'export', 'witness', 'bucket', 'relaxation', 
+words = [
+    'vessel', 'threat', 'detail', 'inquiry', 'marsh', 'revise', 'amber', 'welfare', 'enlarge', 'conglomerate', 'betray', 'falseify',
+    'exploration', 'theorist', 'regret', 'strange', 'ignite', 'recycle', 'leaf', 'excavate', 'angwer', 'install', 'latest', 'cruel',
+    'yearn', 'possible', 'bad', 'liberal', 'brother', 'burn', 'minimum', 'kettle', 'side',
+    'migration', 'growth', 'greeting', 'deall', 'genuine', 'psychology', 'export', 'witness', 'bucket', 'relaxation',
     'cancer', 'taste', 'nomination', 'rise', 'cheat', 'fantasy', 'tent', 'comeau',
-    'coat', 'thunder', 'shiver', 'stream', 'discover', 'fang', 'measure', 'hissing', 'private', 'evaneszent', 'jealous', 
-    'puncture', 'aairplane', 'confess', 'gate', 'potato', 'amusement', 'ratty', 'aboard', 
-    'flesh', 'salty', 'shoe', 'help', 'inject', 'swdanky', 'teeny-tiny', 'jumpy', 
-    'old-fashioned', 'snake', 'man', 'end', 'bed', 'brainy', 'pushy', 
-    'purple', 'boundless', 'park', 'store', 'milky', 'pail', 'annoying', 
-    'charge', 'ill-fated', 'pastoral', 'lamentable', 'panoramic', 'jelly', 'industry', 'fine', 'aromatic', 
+    'coat', 'thunder', 'shiver', 'stream', 'discover', 'fang', 'measure', 'hissing', 'private', 'evaneszent', 'jealous',
+    'puncture', 'aairplane', 'confess', 'gate', 'potato', 'amusement', 'ratty', 'aboard',
+    'flesh', 'salty', 'shoe', 'help', 'inject', 'swdanky', 'teeny-tiny', 'jumpy',
+    'old-fashioned', 'snake', 'man', 'end', 'bed', 'brainy', 'pushy',
+    'purple', 'boundless', 'park', 'store', 'milky', 'pail', 'annoying',
+    'charge', 'ill-fated', 'pastoral', 'lamentable', 'panoramic', 'jelly', 'industry', 'fine', 'aromatic',
 ]
 
 urls = [
@@ -43,7 +42,7 @@ urls = [
     "http://127.0.0.1:8790/people/67/",
     "http://127.0.0.1:8790/people/12/",
     "http://127.0.0.1:8790/people/35/",
-    "http://127.0.0.1:8790/people/1/",
+    "http://127.0.0.1:8790/people/1/", y
     "http://127.0.0.1:8790/people/56/",
     "http://127.0.0.1:8790/people/6/",
     "http://127.0.0.1:8790/people/55/",
@@ -65,8 +64,10 @@ urls = [
 
 files_created = 0
 
+
 def get_filename(file_count):
     return f'tasks/zztask{file_count}.task'
+
 
 def write_dict(file_count, dictionary):
     global files_created
@@ -75,11 +76,13 @@ def write_dict(file_count, dictionary):
     with open(get_filename(file_count), 'w') as f:
         f.write(json.dumps(dictionary, indent=2))
 
+
 def create_prime(file_count, value):
     info = {}
     info['task'] = 'prime'
     info['value'] = value
     write_dict(file_count, info)
+
 
 def create_sum(file_count, start, end):
     info = {}
@@ -88,11 +91,13 @@ def create_sum(file_count, start, end):
     info['end'] = end
     write_dict(file_count, info)
 
+
 def create_upper(file_count, text):
     info = {}
     info['task'] = 'upper'
     info['text'] = text
     write_dict(file_count, info)
+
 
 def create_word(file_count, word):
     info = {}
@@ -100,11 +105,13 @@ def create_word(file_count, word):
     info['word'] = word
     write_dict(file_count, info)
 
+
 def create_name(file_count, url):
     info = {}
     info['task'] = 'name'
     info['url'] = url
     write_dict(file_count, info)
+
 
 def get_task_num(numbers):
     value = random.randint(1, 1000000)
@@ -113,19 +120,21 @@ def get_task_num(numbers):
     numbers.append(value)
     return value
 
+
 def main():
     """ Main function """
 
-    # Remove all task files    
+    # Remove all task files
     files = glob.glob('*.task')
     for f in files:
         os.remove(f)
 
-    random.seed(16273849506) 
+    random.seed(16273849506)
 
     numbers = []
 
-    choice = input('Do you want all task files (y), or just a few for testing (n): ')
+    choice = input(
+        'Do you want all task files (y), or just a few for testing (n): ')
     if choice.upper() == 'Y':
         number_tasks = 1000
         for url in urls:
@@ -135,15 +144,15 @@ def main():
         create_name(get_task_num(numbers), urls[0])
 
     for i in range(number_tasks):
-        value = random.randint(10000000000, 10000000000000) 
+        value = random.randint(10000000000, 10000000000000)
         if value % 2 == 0:
             value += 1
         if value % 5 == 0:
             value += 2
         create_prime(get_task_num(numbers), value)
 
-        value1 = random.randint(0, 1000) 
-        value2 = random.randint(1001, 1000000) 
+        value1 = random.randint(0, 1000)
+        value2 = random.randint(1001, 1000000)
         create_sum(get_task_num(numbers), value1, value2)
 
         create_upper(get_task_num(numbers), random.choice(words))
@@ -151,6 +160,7 @@ def main():
         create_word(get_task_num(numbers), random.choice(words))
 
     print(f'{files_created} files created')
+
 
 if __name__ == '__main__':
     main()

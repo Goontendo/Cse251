@@ -1,4 +1,6 @@
-/* ---------------------------------------
+/*
+	---------------------------------------
+
 Course: CSE 251
 Lesson Week: 12
 File: team.go
@@ -20,7 +22,8 @@ readValue()
 This goroutine will display the contents of the channel containing
 the prime numbers
 
---------------------------------------- */
+---------------------------------------
+*/
 package main
 
 import (
@@ -51,33 +54,46 @@ func isPrime(n int) bool {
 	return true
 }
 
-func worker() {
+func worker(num int, inc int, numbers []int) {
 	// TODO - process numbers on one channel and place prime number on another
+	new := num * inc
+	for w := new; w <= new + inc; w++{
+		if isPrime(w) == true{
+			numbers[w] = w
+		}	
+	}
 }
 
-func readValues() {
+func readValues(numbers []int) {
 	// TODO -Display prime numbers from a channel
+	for i := 1; i == 100; i++{
+		fmt.Printf("%d", numbers[i])
+	}
+
 }
 
 func main() {
 
 	workers := 10
 	numberValues := 100
+	end := 100
+	increment := 10
 
 	// Create any channels that you need
 	// Create any other "things" that you need to get the workers to finish(join)
+	numbers := make([] int, end)
 
 	// create workers
 	for w := 1; w <= workers; w++ {
-		go worker() // Add any arguments
+		go worker(w, increment, numbers) // Add any arguments
 	}
 
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < numberValues; i++ {
-		// ch <- rand.Int()
+		//ch <- rand.Int()
 	}
 
-	go readValues() // Add any arguments
+	go readValues(numbers) // Add any arguments
 
 	fmt.Println("All Done!")
 }
